@@ -24,6 +24,7 @@ A plugin can specify `Graphs` and `Metrics`.
 - `Diff`: If `Diff` is true, differential is used as value.
 - `Stacked`: If `Stacked` is true, the line is stacked.
 - `Scale`: Each value is multiplied by `Scale`.
+- `Match`: If `Match` is true, match with a combination of graph definitions and metric name.
 
 Example of graph definition.
 ```golang

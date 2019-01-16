@@ -32,6 +32,7 @@ type Metrics struct {
 	Diff    bool    `json:"-"`
 	Stacked bool    `json:"stacked"`
 	Scale   float64 `json:"-"`
+	Match   bool    `json:"-"`
 }
 
 // Graphs represents definition of a graph
@@ -209,7 +210,7 @@ func (mp *MackerelPlugin) OutputValues() {
 
 	for key, graph := range mp.GraphDefinition() {
 		for _, metric := range graph.Metrics {
-			if strings.ContainsAny(key+metric.Name, "*#") {
+			if strings.ContainsAny(key+metric.Name, "*#") || metric.Match {
 				mp.formatValuesWithWildcard(key, metric, stat, lastStat, now, lastTime)
 			} else {
 				mp.formatValues(key, metric, stat, lastStat, now, lastTime)
@@ -265,7 +266,7 @@ func (mp *MackerelPlugin) formatValues(prefix string, metric Metrics, stat map[s
 		value *= metric.Scale
 	}
 
-	metricNames := []string{}
+	var metricNames []string
 	if p, ok := mp.Plugin.(PluginWithPrefix); ok {
 		metricNames = append(metricNames, p.MetricKeyPrefix())
 	}
@@ -304,7 +305,7 @@ func (mp *MackerelPlugin) OutputDefinitions() {
 		if g.Label == "" {
 			g.Label = title(k)
 		}
-		metrics := []Metrics{}
+		var metrics []Metrics
 		for _, v := range g.Metrics {
 			if v.Label == "" {
 				v.Label = title(v.Name)
